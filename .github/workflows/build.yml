@@ -35,7 +35,7 @@ jobs:
 
       - name: Build script
         run: |
-          apt-get libtomcrypt libtommath
+          apt install libcrypt-dev:armhf
           ndk="$($ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
                  --list_installed | sed -E 's/( +[|] +)/|/g;s/ +$//' | \
                  grep '^  ndk' | cut -d '|' -f 4 | sort | head -n1)"
