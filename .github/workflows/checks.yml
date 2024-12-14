@@ -1,0 +1,39 @@
+---
+# Copyright © 2021-2024 Matt Robinson
+#
+# SPDX-License-Identifier: MIT
+
+name: Checks
+on:
+  push:
+    branches-ignore:
+      - dependabot/**
+  pull_request:
+  schedule:
+    - cron: '30 12 * * 5'
+
+permissions:
+  contents: read
+
+jobs:
+  overcommit:
+    name: Overcommit
+    runs-on: ubuntu-latest
+    if: github.event_name != 'push' ||
+        github.ref != 'refs/heads/update-version' ||
+        github.event.head_commit.committer.name == 'github-actions[bot]'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install and sign
+        run: |
+          sudo gem install overcommit --no-document
+          overcommit --sign
+          overcommit --sign pre-commit
+
+      - name: Run hooks
+        env:
+          GIT_AUTHOR_NAME: Dummy
+          GIT_AUTHOR_EMAIL: dummy@example.com
+        run: overcommit --run

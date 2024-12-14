@@ -1,0 +1,43 @@
+#!/bin/bash -e
+
+# Copyright © 2020-2024 Matt Robinson
+#
+# SPDX-License-Identifier: MIT
+
+if [ -z "$ANDROID_NDK_HOME" ]; then
+    echo "ANDROID_NDK_HOME is not set" >&2
+    exit 1
+fi
+
+TARGET=${TARGET:-armv7a-linux-androideabi}
+PLATFORM=21
+
+toolchain=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64
+version=$(cat dropbear-version)
+patches=$(find . -maxdepth 1 -name "*.patch" | wc -l)
+[ "$patches" -lt 1 ] && unset -v patches
+
+[ -d buildinfo ] || mkdir buildinfo
+echo $PLATFORM > buildinfo/minsdk
+echo "$version${patches+p$patches}" > buildinfo/release
+grep Pkg.Revision "$ANDROID_NDK_HOME/source.properties" | \
+    cut -d ' ' -f 3 >> buildinfo/ndkver
+
+git clone --branch "$version" --depth 1 https://github.com/YGSRY/dropbear.git
+cd dropbear
+
+if [ "$patches" ]; then
+    for patch in ../*.patch; do
+        patch -p1 < "$patch"
+    done
+fi
+
+./configure --host="$TARGET" \
+    AR="$toolchain/bin/llvm-ar" \
+    CC="$toolchain/bin/$TARGET$PLATFORM-clang" \
+    RANLIB="$toolchain/bin/llvm-ranlib" \
+    STRIP="$toolchain/bin/llvm-strip"
+
+cp ../localoptions.h .
+
+make PROGRAMS="dropbear dbclient dropbearkey dropbearconvert scp" SCPPROGRESS=1
