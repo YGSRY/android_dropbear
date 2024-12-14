@@ -35,12 +35,6 @@ jobs:
 
       - name: Build script
         run: |
-          wget https://github.com/besser82/libxcrypt/releases/download/v4.4.36/libxcrypt-4.4.36.tar.xz
-          tar -xvf libxcrypt-4.4.36.tar.xz  
-          cd libxcrypt-4.4.36
-          ./configure --prefix=/usr/arm-linux-gnueabihf  CC=arm-linux-gnueabihf-gcc \
-          --host=arm
-          
           ndk="$($ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
                  --list_installed | sed -E 's/( +[|] +)/|/g;s/ +$//' | \
                  grep '^  ndk' | cut -d '|' -f 4 | sort | head -n1)"
