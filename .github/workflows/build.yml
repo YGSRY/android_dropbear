@@ -33,11 +33,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: deps
-        run: |
-          sudo apt-get -y update
-          sudo apt-get -y install zlib1g-dev libtomcrypt-dev libtommath-dev mercurial python3-venv libpam0g-dev 
-
       - name: Build script
         run: |
           ndk="$($ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
