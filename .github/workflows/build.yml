@@ -33,18 +33,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-run: |
-          sudo apt-get -y update
-          sudo apt-get -y install zlib1g-dev libtomcrypt-dev libtommath-dev mercurial python3-venv libpam0g-dev $CC
-
-      - uses: actions/checkout@v4
-
       - name: deps
           run: |
           sudo apt-get -y update
           sudo apt-get -y install zlib1g-dev libtomcrypt-dev libtommath-dev mercurial python3-venv libpam0g-dev 
-
-      - uses: actions/checkout@v4
 
       - name: Build script
         run: |
