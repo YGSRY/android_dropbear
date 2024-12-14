@@ -35,6 +35,15 @@ jobs:
 
       - name: Build script
         run: |
+        
+        dpkg --add-architecture armhf
+        
+        deb [arch=armhf] http://ports.ubuntu.com/ focal main restricted
+deb [arch=armhf] http://ports.ubuntu.com/ focal-updates main restricted
+        apt-get updatearmhf
+        
+        apt install libcrypt-dev:armhf
+
           ndk="$($ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
                  --list_installed | sed -E 's/( +[|] +)/|/g;s/ +$//' | \
                  grep '^  ndk' | cut -d '|' -f 4 | sort | head -n1)"
