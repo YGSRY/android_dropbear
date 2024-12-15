@@ -56,7 +56,7 @@ jobs:
           export LD=$TOOLCHAIN/bin/aarch64-linux-android-ld
           export RANLIB=$TOOLCHAIN/bin/aarch64-linux-android-ranlib
           export STRIP=$TOOLCHAIN/bin/aarch64-linux-android-strip
-          ./configure --host=aarch64-linux-android --enable-static
+          ./configure --host=aarch64-linux-android --enable-static || { cat config.log; exit 1; }
           make
 
       - name: Archive build artifacts
