@@ -23,7 +23,7 @@ echo "$version${patches+p$patches}" > buildinfo/release
 grep Pkg.Revision "$ANDROID_NDK_HOME/source.properties" | \
     cut -d ' ' -f 3 >> buildinfo/ndkver
 
-git clone https://android.googlesource.com/platform/external/dropbear
+git clone --branch "$version" --depth 1 https://github.com/YGSRY/dropbear.git
 cd dropbear
 
 if [ "$patches" ]; then
