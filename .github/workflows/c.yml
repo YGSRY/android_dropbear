@@ -34,7 +34,7 @@ jobs:
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
           yes | sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
-          ls -R $ANDROID_HOME
+          ls -R $ANDROID_HOME/ndk/23.1.7779620/toolchains
 
       - name: Install dependencies
         run: |
@@ -48,10 +48,6 @@ jobs:
       - name: Configure and build Dropbear
         run: |
           cd dropbear-2022.83
-          echo "NDK Path:"
-          echo $ANDROID_HOME/ndk/23.1.7779620
-          echo "NDK Directory Contents:"
-          ls -R $ANDROID_HOME/ndk
           export TOOLCHAIN=$ANDROID_HOME/ndk/23.1.7779620/toolchains/llvm/prebuilt/linux-x86_64
           export PATH=$TOOLCHAIN/bin:$PATH
           export AR=$TOOLCHAIN/bin/aarch64-linux-android-ar
