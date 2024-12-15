@@ -34,7 +34,7 @@ jobs:
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
           yes | sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
-          ls -R $ANDROID_HOME/ndk/23.1.7779620
+          ls -R $ANDROID_HOME
 
       - name: Install dependencies
         run: |
@@ -48,6 +48,8 @@ jobs:
       - name: Configure and build Dropbear
         run: |
           cd dropbear-2022.83
+          echo "NDK Toolchains directory:"
+          ls -R $ANDROID_HOME/ndk/23.1.7779620/toolchains
           export TOOLCHAIN=$ANDROID_HOME/ndk/23.1.7779620/toolchains/llvm/prebuilt/linux-x86_64
           export PATH=$TOOLCHAIN/bin:$PATH
           export AR=$TOOLCHAIN/bin/aarch64-linux-android-ar
@@ -57,7 +59,6 @@ jobs:
           export LD=$TOOLCHAIN/bin/aarch64-linux-android-ld
           export RANLIB=$TOOLCHAIN/bin/aarch64-linux-android-ranlib
           export STRIP=$TOOLCHAIN/bin/aarch64-linux-android-strip
-          ls -R $TOOLCHAIN
           ./configure --host=aarch64-linux-android --enable-static || { cat config.log; exit 1; }
           make
 
