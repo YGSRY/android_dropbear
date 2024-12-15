@@ -16,8 +16,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Android NDK
-        uses: actions/setup-ndk@v1
+      - name: Set up Android SDK and NDK
+        uses: android-actions/setup-android@v3
         with:
           ndk-version: '23.1.7779620'
 
