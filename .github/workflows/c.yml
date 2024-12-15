@@ -48,8 +48,10 @@ jobs:
       - name: Configure and build Dropbear
         run: |
           cd dropbear-2022.83
-          echo "NDK Toolchains directory:"
-          ls -R $ANDROID_HOME/ndk/23.1.7779620/toolchains
+          echo "NDK Path:"
+          echo $ANDROID_HOME/ndk/23.1.7779620
+          echo "NDK Directory Contents:"
+          ls -R $ANDROID_HOME/ndk
           export TOOLCHAIN=$ANDROID_HOME/ndk/23.1.7779620/toolchains/llvm/prebuilt/linux-x86_64
           export PATH=$TOOLCHAIN/bin:$PATH
           export AR=$TOOLCHAIN/bin/aarch64-linux-android-ar
