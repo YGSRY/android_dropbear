@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Android NDK
-        uses: android-actions/setup-ndk@v2
+        uses: nttld/setup-ndk@v1
         with:
           ndk-version: '23.1.7779620'
 
