@@ -1,70 +1,58 @@
-name: Build Dropbear for Android
+name: Build Android Dropbear
 
 on:
-  workflow_dispatch:  # 允许手动触发工作流
+  push:
+    branches:
+      - main # 或者你的默认分支
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build-dropbear:
+  build:
     runs-on: ubuntu-latest
 
-    env:
-      NDK_VERSION: r23b
-      NDK_ARCH: arm64-v8a
-      ANDROID_API_LEVEL: 30
-      DROPBEAR_VERSION: 2023.86  # 替换为Dropbear的最新稳定版本
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Download NDK
-      run: |
-        NDK_ZIP="android-ndk-$NDK_VERSION-linux-x86_64.zip"
-        NDK_URL="https://dl.google.com/android/repository/$NDK_ZIP"
-        NDK_PATH="$HOME/android-ndk-$NDK_VERSION"
-
-        # 下载并解压NDK
-        curl -LO "$NDK_URL"
-        unzip -q "$NDK_ZIP" -d "$HOME"
-
-        # 设置NDK路径到环境变量
-        echo "$NDK_PATH/bin" >> $GITHUB_PATH
-
-    - name: Download Dropbear source
-      run: |
-        DROPBEAR_TAR="dropbear-$DROPBEAR_VERSION.tar.bz2"
-        DROPBEAR_URL="https://matt.ucc.asn.au/dropbear/releases/$DROPBEAR_TAR"
-        DROPBEAR_DIR="$HOME/dropbear-$DROPBEAR_VERSION"
-
-        # 下载并解压Dropbear源码
-        curl -LO "$DROPBEAR_URL"
-        tar -xjf "$DROPBEAR_TAR" -C "$HOME"
-
-    - name: Set up build environment
-      run: |
-        export TOOLCHAIN_PREFIX=aarch64-linux-android
-        export CC="$HOME/android-ndk-$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/$TOOLCHAIN_PREFIX$ANDROID_API_LEVEL-clang"
-        export CXX="$HOME/android-ndk-$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/$TOOLCHAIN_PREFIX$ANDROID_API_LEVEL-clang++"
-        export AR="$HOME/android-ndk-$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar"
-        export STRIP="$HOME/android-ndk-$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip"
-        export CFLAGS="--target=$TOOLCHAIN_PREFIX$ANDROID_API_LEVEL -I$HOME/android-ndk-$NDK_VERSION/sysroot/usr/include"
-        export LDFLAGS="--target=$TOOLCHAIN_PREFIX$ANDROID_API_LEVEL -L$HOME/android-ndk-$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$NDK_ARCH"
-
-    - name: Configure and build Dropbear
-      run: |
-        cd "$HOME/dropbear-$DROPBEAR_VERSION"
-        ./configure -static -static-libgcc -static-libstdc++ -DROPBEAR_LIBWRAP=0 -DROPBEAR_PAM=0 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_REENTRANT -DNO_SYSLOG -DNO_UTMP -DNO_WTMP -DNO_UTMPX -DNO_WTMPX -DNO_IPV6
-        make -j$(nproc)
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Setup JDK
+      uses: actions/setup-java@v3
       with:
-        name: dropbear-android-$NDK_ARCH
-        path: "$HOME/dropbear-$DROPBEAR_VERSION"  # 这里应该指定dropbear可执行文件或库文件的实际输出路径
+        distribution: 'zulu'
+        java-version: '11'
 
-# 注意：
-# 1. 上面的示例假设Dropbear源码会被解压到用户主目录下的`dropbear-$DROPBEAR_VERSION`目录中。
-# 2. 编译完成后，你应该根据Dropbear的实际输出路径来调整`upload-artifact`步骤中的`path`参数。
-# 3. 由于NDK和Dropbear的下载可能会很大，这个工作流可能会因为网络问题或GitHub Actions的资源限制而失败。
-# 4. 考虑使用缓存来加速后续构建，特别是当NDK和Dropbear源码很大时。
-# 5. 上面的示例是针对arm64-v8a架构的，如果你需要编译其他架构，需要调整`NDK_ARCH`、`TOOLCHAIN_PREFIX`和相关的编译选项。
+    - name: Install Android SDK and NDK
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: '30' # 根据需要选择API级别
+        arch: 'arm64_v8a' # 架构选择
+        ndk-version: '23.1.7779620' # 选择一个稳定的NDK版本
+
+    - name: Download latest Dropbear release
+      run: |
+        wget https://matt.ucc.asn.au/dropbear/releases/dropbear-latest.tar.bz2
+        tar -jxvf dropbear-latest.tar.bz2
+        cd $(find . -maxdepth 1 -type d -name "dropbear-*")
+        pwd
+
+    - name: Configure Dropbear for Android
+      run: |
+        cd $(find . -maxdepth 1 -type d -name "dropbear-*")
+        ./configure --host=aarch64-linux-android --disable-zlib --disable-largefile --disable-loginfunc \
+          --disable-shadow --disable-utmp --disable-wtmp --disable-lastlog CC=aarch64-linux-android21-clang \
+          CXX=aarch64-linux-android21-clang++ STRIP=aarch64-linux-android-strip LDFLAGS=-static
+
+    - name: Build Dropbear
+      run: |
+        cd $(find . -maxdepth 1 -type d -name "dropbear-*")
+        make clean && make -j$(nproc)
+
+    - name: Upload binaries as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dropbear-binaries
+        path: |
+          $(find . -maxdepth 2 -type d -name "dropbear-*")/dropbear
+          $(find . -maxdepth 2 -type d -name "dropbear-*")/dropbearkey
+          $(find . -maxdepth 2 -type d -name "dropbear-*")/dbclient
