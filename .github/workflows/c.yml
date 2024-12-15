@@ -16,6 +16,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Android NDK
+        uses: android-actions/setup-ndk@v1
+        with:
+          ndk-version: '23.1.7779620'
+
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -26,14 +31,23 @@ jobs:
           wget https://matt.ucc.asn.au/dropbear/releases/dropbear-2022.83.tar.bz2
           tar -xf dropbear-2022.83.tar.bz2
 
-      - name: Build Dropbear
+      - name: Configure and build Dropbear
         run: |
           cd dropbear-2022.83
+          export TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64
+          export PATH=$TOOLCHAIN/bin:$PATH
+          export AR=$TOOLCHAIN/bin/aarch64-linux-android-ar
+          export AS=$TOOLCHAIN/bin/aarch64-linux-android-as
+          export CC=$TOOLCHAIN/bin/aarch64-linux-android21-clang
+          export CXX=$TOOLCHAIN/bin/aarch64-linux-android21-clang++
+          export LD=$TOOLCHAIN/bin/aarch64-linux-android-ld
+          export RANLIB=$TOOLCHAIN/bin/aarch64-linux-android-ranlib
+          export STRIP=$TOOLCHAIN/bin/aarch64-linux-android-strip
           ./configure --host=aarch64-linux-android --enable-static
           make
 
       - name: Archive build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v2
         with:
           name: dropbear-android
           path: dropbear-2022.83/dropbear
