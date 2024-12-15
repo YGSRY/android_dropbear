@@ -18,3 +18,5 @@
 
 // Change the fallback list of shells to the non-standard Android shell path
 #define COMPAT_USER_SHELLS "/system/bin/sh"
+
+#define DROPBEAR_DEFAULT_SSH_CONFIG "/etc/dropbear/.ssh/dropbear_config"
