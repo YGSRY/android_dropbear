@@ -27,7 +27,7 @@ jobs:
       with:
         api-level: '30' # 根据需要选择API级别
         arch: 'arm64-v8a' # 架构选择
-        ndk-version: '23.1.7779620' # 选择一个稳定的NDK版本
+        ndk-version: '27.2.12479018' # 选择一个稳定的NDK版本
 
     - name: Download latest Dropbear release
       run: |
