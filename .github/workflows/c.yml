@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Android NDK
-        uses: android-actions/setup-ndk@v1
+        uses: nttld/setup-ndk@v1
         with:
           ndk-version: '23.1.7779620'
 
@@ -47,7 +47,7 @@ jobs:
           make
 
       - name: Archive build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: dropbear-android
           path: dropbear-2022.83/dropbear
