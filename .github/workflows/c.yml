@@ -33,7 +33,8 @@ jobs:
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
           yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
-          yes | sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
+          yes | sdkmanager --sdk_root=$ANDROID_HOME "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk-bundle"
+          yes | sdkmanager --sdk_root=$ANDROID_HOME "ndk;23.1.7779620"
           ls -R $ANDROID_HOME
 
       - name: Install dependencies
