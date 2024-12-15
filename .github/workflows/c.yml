@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Android NDK
-        uses: actions/setup-android@v2
+        uses: actions/setup-android@v4
         with:
           ndk-version: '23.0.7599858'
 
@@ -38,7 +38,7 @@ jobs:
           make
 
       - name: Archive build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: dropbear-android
           path: dropbear-2022.83/dropbear
