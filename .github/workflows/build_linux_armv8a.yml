@@ -1,0 +1,48 @@
+name: Build Dropbear for ARMv8-A
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential wget gcc-aarch64-linux-gnu musl-tools
+
+    - name: Download Latest Stable Dropbear
+      run: |
+        wget https://matt.ucc.asn.au/dropbear/releases/dropbear-latest.tar.bz2
+        tar -xjf dropbear-latest.tar.bz2
+        cd dropbear-*
+        echo "::set-output name=dropbear_dir::$(pwd)"
+
+    - name: Configure and Build
+      run: |
+        cd ${{ steps.download.outputs.dropbear_dir }}
+        CC=aarch64-linux-gnu-gcc ./configure --host=aarch64-linux-gnu --enable-static --disable-zlib
+        make PROGRAMS="dropbear dbclient dropbearkey dropbearconvert scp"
+
+    - name: Package Binaries
+      run: |
+        cd ${{ steps.download.outputs.dropbear_dir }}
+        mkdir -p output
+        cp dropbear dbclient dropbearkey dropbearconvert scp output/
+        tar -czvf dropbear-armv8a.tar.gz output/
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: dropbear-armv8a
+        path: ${{ steps.configure.outputs.dropbear_dir }}/dropbear-armv8a.tar.gz
