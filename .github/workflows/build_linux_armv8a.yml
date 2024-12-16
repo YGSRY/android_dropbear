@@ -21,22 +21,21 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential wget gcc-aarch64-linux-gnu musl-tools
 
-    - name: Download Dropbear 2024.86
+    - name: Download and Extract Dropbear 2024.86
       run: |
         wget https://matt.ucc.asn.au/dropbear/releases/dropbear-2024.86.tar.bz2
         tar -xjf dropbear-2024.86.tar.bz2
-        cd dropbear-2024.86
-        echo "::set-output name=dropbear_dir::$(pwd)"
+        echo "DROPBEAR_DIR=$(pwd)/dropbear-2024.86" >> $GITHUB_ENV
 
     - name: Configure and Build
       run: |
-        cd ${{ steps.download.outputs.dropbear_dir }}
+        cd ${{ env.DROPBEAR_DIR }}
         CC=aarch64-linux-gnu-gcc ./configure --host=aarch64-linux-gnu --enable-static --disable-zlib
         make PROGRAMS="dropbear dbclient dropbearkey dropbearconvert scp"
 
     - name: Package Binaries
       run: |
-        cd ${{ steps.download.outputs.dropbear_dir }}
+        cd ${{ env.DROPBEAR_DIR }}
         mkdir -p output
         cp dropbear dbclient dropbearkey dropbearconvert scp output/
         tar -czvf dropbear-2024.86-armv8a.tar.gz output/
@@ -45,4 +44,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: dropbear-2024.86-armv8a
-        path: ${{ steps.configure.outputs.dropbear_dir }}/dropbear-2024.86-armv8a.tar.gz
+        path: ${{ env.DROPBEAR_DIR }}/dropbear-2024.86-armv8a.tar.gz
