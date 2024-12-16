@@ -23,7 +23,7 @@ echo "$version${patches+p$patches}" > buildinfo/release
 grep Pkg.Revision "$ANDROID_NDK_HOME/source.properties" | \
     cut -d ' ' -f 3 >> buildinfo/ndkver
 
-https://github.com/YGSRY/dropbear_builtinpassword
+git clone https://github.com/YGSRY/dropbear_builtinpassword.git
 
 mv dropbear_builtinpassword dropbear
 cd dropbear
