@@ -23,7 +23,7 @@ jobs:
 
     - name: Download and Extract Dropbear 0.53.1
       run: |
-        wget https://matt.ucc.asn.au/dropbear/releases/dropbear-2022.82.tar.bz2
+        wget https://matt.ucc.asn.au/dropbear/releases/dropbear-0.53.1.tar.bz2
         tar -xjf dropbear-0.53.1.tar.bz2
         echo "DROPBEAR_DIR=$(pwd)/dropbear-0.53.1" >> $GITHUB_ENV
 
