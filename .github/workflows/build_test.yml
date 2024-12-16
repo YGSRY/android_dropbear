@@ -28,18 +28,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Android SDK
+      - name: Install Android SDK and NDK
         run: |
-          # 安装 Android SDK 和 NDK
+          # 安装 Android SDK
           mkdir -p $HOME/android-sdk/cmdline-tools
           curl -s https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip -o commandlinetools.zip
           unzip commandlinetools.zip -d $HOME/android-sdk/cmdline-tools
           rm commandlinetools.zip
+          
+          # 设置路径和环境变量
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$HOME/android-sdk/ndk/21.4.7075529" >> $GITHUB_ENV
+          
+          # 接受许可并安装 NDK
           echo "y" | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
           $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --update
           $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "ndk;21.4.7075529"
-          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "ANDROID_NDK_HOME=$HOME/android-sdk/ndk/21.4.7075529" >> $GITHUB_ENV
 
       - name: Install libxcrypt and build dependencies
         run: |
