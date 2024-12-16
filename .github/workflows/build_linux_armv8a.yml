@@ -1,47 +1,56 @@
-name: Build Dropbear 0.53.1 for ARMv8-A
+name: CI
 
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Source Code
+    - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Install Dependencies
+    - name: Set up environment
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential wget gcc-aarch64-linux-gnu musl-tools
+        sudo apt-get install -y build-essential libssl-dev zlib1g-dev
 
-    - name: Download and Extract Dropbear 0.53.1
+    - name: Download Dropbear 0.53.1
       run: |
         wget https://matt.ucc.asn.au/dropbear/releases/dropbear-0.53.1.tar.bz2
         tar -xjf dropbear-0.53.1.tar.bz2
-        echo "DROPBEAR_DIR=$(pwd)/dropbear-0.53.1" >> $GITHUB_ENV
+        cd dropbear-0.53.1
 
-    - name: Configure and Build
-      run: |
-        cd ${{ env.DROPBEAR_DIR }}
-        CC=aarch64-linux-gnu-gcc ./configure --host=aarch64-linux-gnu --enable-static --disable-zlib
-        make PROGRAMS="dropbear dbclient dropbearkey dropbearconvert scp"
+    - name: Clone zlib
+      run: git clone https://github.com/mkj/zlib.git
 
-    - name: Package Binaries
+    - name: Build zlib
       run: |
-        cd ${{ env.DROPBEAR_DIR }}
-        mkdir -p output
-        cp dropbear dbclient dropbearkey dropbearconvert scp output/
-        tar -czvf dropbear-0.53.1-armv8a.tar.gz output/
+        cd zlib
+        ./configure --prefix=/usr/local/zlib
+        make
+        sudo make install
+
+    - name: Configure Dropbear
+      run: |
+        cd dropbear-0.53.1
+        export PATH=/usr/local/zlib/bin:$PATH
+        ./configure --host=arm-linux-gnueabihf --prefix=/usr/local/dropbear --with-zlib=/usr/local/zlib
+
+    - name: Build Dropbear
+      run: make
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: dropbear-0.53.1-armv8a
-        path: ${{ env.DROPBEAR_DIR }}/dropbear-0.53.1-armv8a.tar.gz
+        name: dropbear-0.53.1
+        path: dropbear-0.53.1
+
+    - name: Verify installation
+      run: dbclient --version
