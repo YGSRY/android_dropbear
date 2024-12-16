@@ -1,4 +1,4 @@
-name: Build Dropbear for ARMv8-A
+name: Build Dropbear 2024.86 for ARMv8-A
 
 on:
   push:
@@ -21,11 +21,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential wget gcc-aarch64-linux-gnu musl-tools
 
-    - name: Download Latest Stable Dropbear
+    - name: Download Dropbear 2024.86
       run: |
-        wget https://matt.ucc.asn.au/dropbear/releases/dropbear-latest.tar.bz2
-        tar -xjf dropbear-latest.tar.bz2
-        cd dropbear-*
+        wget https://matt.ucc.asn.au/dropbear/releases/dropbear-2024.86.tar.bz2
+        tar -xjf dropbear-2024.86.tar.bz2
+        cd dropbear-2024.86
         echo "::set-output name=dropbear_dir::$(pwd)"
 
     - name: Configure and Build
@@ -39,10 +39,10 @@ jobs:
         cd ${{ steps.download.outputs.dropbear_dir }}
         mkdir -p output
         cp dropbear dbclient dropbearkey dropbearconvert scp output/
-        tar -czvf dropbear-armv8a.tar.gz output/
+        tar -czvf dropbear-2024.86-armv8a.tar.gz output/
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: dropbear-armv8a
-        path: ${{ steps.configure.outputs.dropbear_dir }}/dropbear-armv8a.tar.gz
+        name: dropbear-2024.86-armv8a
+        path: ${{ steps.configure.outputs.dropbear_dir }}/dropbear-2024.86-armv8a.tar.gz
