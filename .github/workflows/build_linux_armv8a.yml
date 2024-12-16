@@ -41,7 +41,7 @@ jobs:
       run: |
         cd dropbear-0.53.1
         export PATH=/usr/local/zlib/bin:$PATH
-        ./configure --host=arm-linux-gnueabihf --prefix=/usr/local/dropbear --with-zlib=/usr/local/zlib
+        ./configure --host=aarch64-unknown-linux-gnu --prefix=/usr/local/dropbear --with-zlib=/usr/local/zlib
 
     - name: Build Dropbear
       run: make
