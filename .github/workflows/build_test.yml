@@ -28,6 +28,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Android SDK
+        run: |
+          # 安装 Android SDK 和 NDK
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          curl -s https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip -o commandlinetools.zip
+          unzip commandlinetools.zip -d $HOME/android-sdk/cmdline-tools
+          rm commandlinetools.zip
+          echo "y" | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --update
+          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "ndk;21.4.7075529"
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$HOME/android-sdk/ndk/21.4.7075529" >> $GITHUB_ENV
+
       - name: Install libxcrypt and build dependencies
         run: |
           git clone https://github.com/besser82/libxcrypt.git
