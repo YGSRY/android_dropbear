@@ -1,4 +1,4 @@
-name: Build Dropbear 2022.82 for ARMv8-A
+name: Build Dropbear 0.53.1 for ARMv8-A
 
 on:
   push:
@@ -21,11 +21,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential wget gcc-aarch64-linux-gnu musl-tools
 
-    - name: Download and Extract Dropbear 2022.82
+    - name: Download and Extract Dropbear 0.53.1
       run: |
         wget https://matt.ucc.asn.au/dropbear/releases/dropbear-2022.82.tar.bz2
-        tar -xjf dropbear-2022.82.tar.bz2
-        echo "DROPBEAR_DIR=$(pwd)/dropbear-2022.82" >> $GITHUB_ENV
+        tar -xjf dropbear-0.53.1.tar.bz2
+        echo "DROPBEAR_DIR=$(pwd)/dropbear-0.53.1" >> $GITHUB_ENV
 
     - name: Configure and Build
       run: |
@@ -38,10 +38,10 @@ jobs:
         cd ${{ env.DROPBEAR_DIR }}
         mkdir -p output
         cp dropbear dbclient dropbearkey dropbearconvert scp output/
-        tar -czvf dropbear-2022.82-armv8a.tar.gz output/
+        tar -czvf dropbear-0.53.1-armv8a.tar.gz output/
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: dropbear-2022.82-armv8a
-        path: ${{ env.DROPBEAR_DIR }}/dropbear-2022.82-armv8a.tar.gz
+        name: dropbear-0.53.1-armv8a
+        path: ${{ env.DROPBEAR_DIR }}/dropbear-0.53.1-armv8a.tar.gz
