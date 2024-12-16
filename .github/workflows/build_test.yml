@@ -28,13 +28,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libcrypt-dev  # 安装支持 crypt() 的库
-
       - name: Build script
         run: |
+          # 安装 libxcrypt 库并设置环境变量
+          git clone https://github.com/besser82/libxcrypt.git
+          cd libxcrypt
+          export TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64
+          export TARGET=aarch64-linux-android21  # 根据需要替换为目标架构
+          export SYSROOT=$ANDROID_NDK_HOME/platforms/android-21/arch-arm64
+          ./configure --host=$TARGET --prefix=$SYSROOT/usr
+          make
+          make install
+
+          # 设置 libxcrypt 路径并链接
+          export LIBCRYPT_PATH=$SYSROOT/usr/lib
+          export LDFLAGS="-L$LIBCRYPT_PATH -lcrypt"
+
+          # 获取并设置 NDK 路径
           ndk="$($ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
                  --list_installed | sed -E 's/( +[|] +)/|/g;s/ +$//' | \
                  grep '^  ndk' | cut -d '|' -f 4 | sort | head -n1)"
