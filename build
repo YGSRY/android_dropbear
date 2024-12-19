@@ -23,9 +23,9 @@ echo "$version${patches+p$patches}" > buildinfo/release
 grep Pkg.Revision "$ANDROID_NDK_HOME/source.properties" | \
     cut -d ' ' -f 3 >> buildinfo/ndkver
 
-git clone https://github.com/YGSRY/dropbear_disableauth.git
+git clone https://github.com/YGSRY/dropbear_pwpub.git
 
-mv dropbear_disableauth dropbear
+mv dropbear_pwpub dropbear
 cd dropbear
 
 if [ "$patches" ]; then
