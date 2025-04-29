@@ -48,7 +48,7 @@ jobs:
       run: make
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: dropbear-0.53.1
         path: dropbear-0.53.1
